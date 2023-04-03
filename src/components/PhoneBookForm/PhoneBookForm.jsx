@@ -1,7 +1,9 @@
 import { Formik, ErrorMessage } from 'formik';
 import { Button, WholeForm, Label, Input } from './PhoneBookForm.styled';
 import * as Yup from 'yup';
-import PropTypes from 'prop-types';
+import { useDispatch, useSelector } from 'react-redux';
+import { addContact } from 'redux/contactsSlice';
+import { getContacts } from 'redux/selectors';
 
 const phoneCheck =
   /^(([\\+]*[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{2,4}?[ \\-]*[0-9]{2,4}?$/;
@@ -20,7 +22,10 @@ const formSchema = Yup.object().shape({
     .required('Phone number is required'),
 });
 
-const PhoneBookForm = ({ onSubmit, contacts }) => {
+const PhoneBookForm = () => {
+  const dispatch = useDispatch();
+  const contacts = useSelector(getContacts);
+
   const handleSubmit = (values, { resetForm }) => {
     const haveName = contacts.find(
       contact => contact.name.toLowerCase() === values.name.toLowerCase()
@@ -30,9 +35,8 @@ const PhoneBookForm = ({ onSubmit, contacts }) => {
       return;
     }
 
-    onSubmit({
-      ...values,
-    });
+    dispatch(addContact(values));
+
     resetForm();
   };
 
@@ -67,12 +71,3 @@ const PhoneBookForm = ({ onSubmit, contacts }) => {
 };
 
 export default PhoneBookForm;
-
-PhoneBookForm.propTypes = {
-  onSubmit: PropTypes.func.isRequired,
-  contacts: PropTypes.arrayOf(
-    PropTypes.shape({
-      name: PropTypes.string.isRequired,
-    })
-  ).isRequired,
-};
